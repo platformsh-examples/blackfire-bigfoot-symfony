@@ -22,18 +22,17 @@ tests:
     "The homepage should be fast":
         path: "/"
         assertions:
-            - "main.wall_time < 100ms"
+            - "main.wall_time <= 250ms"
 
     "The number of created entities should be reasonable":
         path: "/.*"
         assertions:
-            - "metrics.entities.created.count < 50"
+            - "metrics.entities.created.count <= 50"
 
     "The homepage should have a limited number of SQL queries":
         path: "/"
         assertions:
             - "metrics.sql.queries.count <= 5"
-
 
     "The autoloader classmap should be dumped":
         path: "/.*"
@@ -49,11 +48,6 @@ tests:
         path: "/.*"
         assertions:
             - "metrics.app.agree_to_terms.count == 0"
-
-    "Github API should be called only once":
-        path: "/api/github-organization"
-        assertions:
-            - "metrics.http.requests.count == 1"
 
 # For writing scenarios, take a look at the documentation
 # https://blackfire.io/docs/cookbooks/scenarios
@@ -105,11 +99,13 @@ scenarios: |
             expect css('nav.navbar ul.navbar-nav > li.nav-item:nth-child(3) a.nav-link').text() == ' Log Out'
 
     scenario
+        warmup false
         name "Anonymous Visit"
         include regular_visit
         include xhr_calls
 
     scenario
+        warmup false
         name "Authenticated Visit"
         include login
         include regular_visit
